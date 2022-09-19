@@ -27,8 +27,8 @@ public:
     virtual bool Contains(const char* key) const = 0;
 };
 
-FilterPolicy* NewBloomFilterPolicy(size_t data_size);
-FilterPolicy* NewShiftingBloomFilterPolicy();
+FilterPolicy* NewBloomFilterPolicy(size_t data_size, size_t k);
+FilterPolicy* NewShiftingBloomFilterPolicy(size_t k);
 FilterPolicy* NewSpatialBloomFilterPolicy();
 
 #endif // FILTER_POLICY_H_
