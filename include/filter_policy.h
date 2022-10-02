@@ -25,10 +25,16 @@ public:
      * @return false 
      */
     virtual bool Contains(const char* key) const = 0;
+
+    /**
+     * @brief reset
+     * 
+     */
+    virtual void Reset() = 0;
 };
 
 FilterPolicy* NewBloomFilterPolicy(size_t data_size, size_t k);
 FilterPolicy* NewShiftingBloomFilterPolicy(size_t k);
-FilterPolicy* NewSpatialBloomFilterPolicy();
+FilterPolicy* NewSpatialBloomFilterPolicy(size_t k);
 
 #endif // FILTER_POLICY_H_
