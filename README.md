@@ -101,7 +101,7 @@ $$
 
 判断元素 x 是否属于 $\Delta_i$ 必须满足如下两个条件, 任何一个条件不符合都直接返回假: 
 
-1. $\exist h \in H, 使 B[h(x) \% m] = i;$
+1. $\exists h \in H, 使 B[h(x) \% m] = i;$
 2. $\forall h \in H, B[h(x) \% m] \ge i;$
 
 如果存在某一个散列地址的值为 0, 则直接返回为假, 因为只有数组初始化时该位置会为 0。
@@ -164,10 +164,8 @@ Shifting Bloom Filter 在准确度上比 Bloom Filter 略高, 但是却节省了
 通过右侧的时间分析也能看出, 随着 Hash 函数个数的增加, 过滤器的性能也在下降花费的时间在上升。但是,总体来说符合如下的公式:
 
 $$
-
 T_{Spatial Bloom Filter} > T_{Bloom Filter} > T_{Shifting Bloom Filter} \\
 FPR_{Bloom Filter} > FPR_{Shifting Bloom Filter} > FPR_{Spatial Bloom Filter}
-
 $$
 
 ![K](./img/K.png)
