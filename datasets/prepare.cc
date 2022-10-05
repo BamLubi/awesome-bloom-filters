@@ -64,10 +64,10 @@ int main()
 {
     ofstream ofs;
     // 1. 生成高斯分布数据集
-    // gen_data("./test_normal.txt", ofs, gen_normal);
+    gen_data("./test_normal.txt", ofs, gen_normal);
 
     // 2. 生成均匀分布数据集
-    // gen_data("./test_uniform.txt", ofs, gen_uniform);
+    gen_data("./test_uniform.txt", ofs, gen_uniform);
 
     // 3. 生成指数分布数据集
     gen_data("./test_exp.txt", ofs, gen_exp);
