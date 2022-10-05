@@ -6,6 +6,8 @@ The implement of three kinds of **Bloom Filter**
 - Shifting Bloom Filter
 - Spatial Bloom Filter
 
+[toc]
+
 # 一、算法简介
 
 ## 1.1 Bloom Filter
@@ -164,7 +166,9 @@ Shifting Bloom Filter 在准确度上比 Bloom Filter 略高, 但是却节省了
 通过右侧的时间分析也能看出, 随着 Hash 函数个数的增加, 过滤器的性能也在下降花费的时间在上升。但是,总体来说符合如下的公式:
 
 $$
-T_{Spatial Bloom Filter} > T_{Bloom Filter} > T_{Shifting Bloom Filter} \\
+T_{Spatial Bloom Filter} > T_{Bloom Filter} > T_{Shifting Bloom Filter}
+$$
+$$
 FPR_{Bloom Filter} > FPR_{Shifting Bloom Filter} > FPR_{Spatial Bloom Filter}
 $$
 
