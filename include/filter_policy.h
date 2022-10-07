@@ -8,7 +8,19 @@ class FilterPolicy
 {
 public:
 
+    /**
+     * @brief Return the name of filter
+     * 
+     * @return const char* 
+     */
     virtual const char* Name() const = 0;
+
+    /**
+     * @brief Return the number of Hash fucntions
+     * 
+     * @return const size_t 
+     */
+    virtual const size_t K() const = 0;
 
     /**
      * @brief Add Key to Bloom Filter
@@ -36,5 +48,6 @@ public:
 FilterPolicy* NewBloomFilterPolicy(size_t data_size, size_t k);
 FilterPolicy* NewShiftingBloomFilterPolicy(size_t k);
 FilterPolicy* NewSpatialBloomFilterPolicy(size_t k);
+FilterPolicy* NewImproveShiftingBloomFilterPolicy(size_t k);
 
 #endif // FILTER_POLICY_H_

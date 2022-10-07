@@ -32,6 +32,8 @@ public:
 
     const char *Name() const override { return "BloomFilterPolicy"; }
 
+    const size_t K() const override { return k_; }
+
     // override
     void Add(const char *key) override
     {
