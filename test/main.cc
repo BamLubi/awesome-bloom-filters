@@ -6,23 +6,32 @@
 #include <fstream>
 #include <vector>
 
+/**
+ * @brief 测试
+ * 
+ * @param path 测试数据集路径
+ * @param filter 过滤器
+ */
 void test(const char *path, FilterPolicy *filter)
 {
-    printf("\nTest Path: %s; Filter: %s\n", path, filter->Name());
+    printf("\nTest Path: %s; Filter: %s; Hash Functions: %ld\n", path, filter->Name(), filter->K());
     std::ifstream file;
     std::string s;
-    int total = 0;
-    int fault = 0;
     std::vector<float> time_stat;
     std::vector<float> fault_stat;
+    int total = 0;
+    int fault = 0;
 
+    // 打开文件
     file.open(path, std::ios_base::in);
     filter->Reset();
 
+    // 设置计时器
     auto t_start_init = std::chrono::high_resolution_clock::now();
     auto t_start = std::chrono::high_resolution_clock::now();
     auto t_end = std::chrono::high_resolution_clock::now();
 
+    // 读取文件
     while (getline(file, s))
     {
         const char *key = s.substr(0, s.size() - 2).c_str();
@@ -43,6 +52,8 @@ void test(const char *path, FilterPolicy *filter)
     }
     t_end = std::chrono::high_resolution_clock::now();
     float t_total = std::chrono::duration<float, std::milli>(t_end - t_start_init).count() / 1000;
+
+    // 打印统计信息
     // FAULT
     printf("FAULT: ");
     for (auto t : fault_stat)
@@ -58,6 +69,11 @@ void test(const char *path, FilterPolicy *filter)
     file.close();
 }
 
+/**
+ * @brief 简易测试, 只测试一个元素
+ *
+ * @param filter 过滤器
+ */
 void simple_test(FilterPolicy *filter)
 {
     std::cout << "\nTest : " << filter->Name() << std::endl;
@@ -82,25 +98,47 @@ void simple_test(FilterPolicy *filter)
 
 int main()
 {
-    int k = 10;
-    FilterPolicy *bloom = NewBloomFilterPolicy(1e8, k);
-    FilterPolicy *shift_bloom = NewShiftingBloomFilterPolicy(k);
-    FilterPolicy *spatial_bloom = NewSpatialBloomFilterPolicy(k);
+    { // 测试一: 测试三种不同数据集分布下不同过滤器的差距
+        FilterPolicy *bloom = NewBloomFilterPolicy(1e8, 10);
+        FilterPolicy *shift_bloom = NewShiftingBloomFilterPolicy(10);
+        FilterPolicy *spatial_bloom = NewSpatialBloomFilterPolicy(10);
 
-    // 1. 高斯分布
-    test("../datasets/test_normal.txt", bloom);
-    test("../datasets/test_normal.txt", shift_bloom);
-    test("../datasets/test_normal.txt", spatial_bloom);
+        // 1.1 高斯分布
+        test("../datasets/test_normal.txt", bloom);
+        test("../datasets/test_normal.txt", shift_bloom);
+        test("../datasets/test_normal.txt", spatial_bloom);
+        // 1.2 均匀分布
+        test("../datasets/test_uniform.txt", bloom);
+        test("../datasets/test_uniform.txt", shift_bloom);
+        test("../datasets/test_uniform.txt", spatial_bloom);
+        // 1.3 指数分布
+        test("../datasets/test_exp.txt", bloom);
+        test("../datasets/test_exp.txt", shift_bloom);
+        test("../datasets/test_exp.txt", spatial_bloom);
+    }
 
-    // 2. 均匀分布
-    test("../datasets/test_uniform.txt", bloom);
-    test("../datasets/test_uniform.txt", shift_bloom);
-    test("../datasets/test_uniform.txt", spatial_bloom);
+    { // 测试二: 不同 K 值对过滤器的影响，使用均匀分布的数据集
+        int k_list[] = {2, 4, 6, 8, 10, 12, 14};
+        for (auto k : k_list)
+        {
+            FilterPolicy *bloom = NewBloomFilterPolicy(1e8, k);
+            FilterPolicy *shift_bloom = NewShiftingBloomFilterPolicy(k);
+            FilterPolicy *spatial_bloom = NewSpatialBloomFilterPolicy(k);
+            test("../datasets/test_uniform.txt", bloom);
+            test("../datasets/test_uniform.txt", shift_bloom);
+            test("../datasets/test_uniform.txt", spatial_bloom);
+            delete bloom;
+            delete shift_bloom;
+            delete spatial_bloom;
+        }
+    }
 
-    // 3. 指数分布
-    test("../datasets/test_exp.txt", bloom);
-    test("../datasets/test_exp.txt", shift_bloom);
-    test("../datasets/test_exp.txt", spatial_bloom);
+    { // 测试三: 测试对 Shifting Bloom Filter 的改进
+        FilterPolicy *imp_shift_bloom = NewImproveShiftingBloomFilterPolicy(10);
+        test("../datasets/test_normal.txt", imp_shift_bloom);
+        test("../datasets/test_uniform.txt", imp_shift_bloom);
+        test("../datasets/test_exp.txt", imp_shift_bloom);
+    }
 
     return 0;
 }

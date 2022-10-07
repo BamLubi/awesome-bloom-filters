@@ -81,6 +81,14 @@ shbf_uniform_14_total_time = 71.033112
 sbf_uniform_14_fault = [0.0084868,0.0184874,0.0330235,0.0525283,0.0751116,0.0991015,0.123436,0.147504,0.170881,0.193485]
 sbf_uniform_14_total_time = 236.876572
 
+## 改进的Shifting Bloom Filter
+ishbf_normal_10_fault = [0.0135764,0.0396659,0.0758883,0.114451,0.150458,0.182549,0.210653,0.235144,0.256509,0.275205]
+ishbf_normal_10_total_time = 82.341339
+ishbf_uniform_10_fault = [0.0121663,0.032758,0.0580955,0.0822875,0.102576,0.118529,0.130587,0.139379,0.145545,0.149617]
+ishbf_uniform_10_total_time = 74.519470
+ishbf_exp_10_fault = [8.8e-06,8.5e-06,7.7e-06,7.075e-06,6.58e-06,6.36667e-06,5.9e-06,5.525e-06,5.3e-06,5.06e-06]
+ishbf_exp_10_total_time = 48.484074
+
 
 # 1. 三种数据集分布 - FPR
 plt.figure(figsize=(15,5))
@@ -173,6 +181,74 @@ plt.plot(x, sbf_uniform_time, color='b', marker='o', linewidth=2, label='spatial
 plt.title('The Time effect of K under Uniform Distribution')
 plt.xlabel('K')
 plt.ylabel('Time (s)')
+plt.legend()
+
+plt.show()
+
+# 4. Shifting Bloom Filter 和改进后的比较
+plt.figure(figsize=(10,10))
+
+plt.subplot(221)
+plt.plot(bf_normal_10_fault, color='gold', marker='.', linestyle='--', linewidth=2, label='bloom filter')
+plt.plot(shbf_normal_10_fault, color='g', marker='.', linestyle='--', linewidth=2, label='shifting bloom filter')
+plt.plot(sbf_normal_10_fault, color='cyan', marker='.', linestyle='--', linewidth=2, label='spatial bloom filter')
+plt.plot(ishbf_normal_10_fault, color='r', marker='o', linewidth=2, label='improve spatial bloom filter')
+plt.title('Normal Distribution')
+plt.xlabel('Data x1e7')
+plt.ylabel('FPR')
+plt.legend()
+
+plt.subplot(222)
+plt.plot(bf_uniform_10_fault, color='gold', marker='.', linestyle='--', linewidth=2, label='bloom filter')
+plt.plot(shbf_uniform_10_fault, color='g', marker='.', linestyle='--', linewidth=2, label='shifting bloom filter')
+plt.plot(sbf_uniform_10_fault, color='cyan', marker='.', linestyle='--', linewidth=2, label='spatial bloom filter')
+plt.plot(ishbf_uniform_10_fault, color='r', marker='o', linewidth=2, label='improve spatial bloom filter')
+plt.title('Uniform Distribution')
+plt.xlabel('Data x1e7')
+plt.ylabel('FPR')
+plt.legend()
+
+plt.subplot(223)
+plt.plot(bf_exp_10_fault, color='gold', marker='.', linestyle='--', linewidth=2, label='bloom filter')
+plt.plot(shbf_exp_10_fault, color='g', marker='.', linestyle='--', linewidth=2, label='shifting bloom filter')
+plt.plot(sbf_exp_10_fault, color='cyan', marker='.', linestyle='--', linewidth=2, label='spatial bloom filter')
+plt.plot(ishbf_exp_10_fault, color='r', marker='o', linewidth=2, label='improve spatial bloom filter')
+plt.title('Exponential Distribution')
+plt.xlabel('Data x1e7')
+plt.ylabel('FPR')
+plt.legend()
+
+plt.subplot(224)
+size = 3
+# 返回size个0-1的随机数
+a = [bf_normal_10_total_time, bf_uniform_10_total_time, bf_exp_10_total_time]
+b = [shbf_normal_10_total_time, shbf_uniform_10_total_time, shbf_exp_10_total_time]
+c = [sbf_normal_10_total_time, sbf_uniform_10_total_time, sbf_exp_10_total_time]
+d = [ishbf_normal_10_total_time, ishbf_uniform_10_total_time, ishbf_exp_10_total_time]
+x = np.arange(size)
+x_labels = ["Normal Distribution", "Uniform Distribution", "Exponential Distribution"]
+# 有a/b/c/d四种类型的数据，n设置为3
+total_width, n = 0.6, 4
+# 每种类型的柱状图宽度
+width = total_width / n
+# 重新设置x轴的坐标
+x = x - (total_width - width) / 2
+# 画柱状图
+plt.bar(x, a, width=width, color='gold', label="bloom filter")
+plt.bar(x + width, b, width=width, color='g', label="shifting bloom filter")
+plt.bar(x + 2*width, c, width=width, color='cyan', label="spatial bloom filter")
+plt.bar(x + 3*width, d, width=width, color='r', label="improve shifting bloom filter")
+for i, j in zip(x, a):
+    plt.text(i, j + 0.01, "%.1f" % j, ha="center", va="bottom", fontsize=10)
+for i, j in zip(x + width, b):
+    plt.text(i, j + 0.01, "%.1f" % j, ha="center", va="bottom", fontsize=10)
+for i, j in zip(x + 2*width, c):
+    plt.text(i, j + 0.01, "%.1f" % j, ha="center", va="bottom", fontsize=10)
+for i, j in zip(x + 3*width, d):
+    plt.text(i, j + 0.01, "%.1f" % j, ha="center", va="bottom", fontsize=10)
+plt.title('Total Time Analysis')
+plt.xticks(x+width*1.5, x_labels)
+plt.ylabel('Total Time (s)')
 plt.legend()
 
 plt.show()
