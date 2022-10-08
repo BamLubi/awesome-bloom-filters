@@ -23,7 +23,7 @@ The implement of three kinds of **Bloom Filter**
 设置 k 个哈希函数, 对输入的值 x 进行散列, 并将散列结果与数组容量进行取余, 并设置为 1。即:
 
 $$
-B[h_i(x) \% m] = 1, i=1,2,...,k
+B \left [ h_i(x) \% m  \right ] = 1, i=1,2,...,k
 $$
 
 ![Bloom Filter 2](./img/bf_2.png)
@@ -59,8 +59,8 @@ $$
 对于元素 e, 我们如图所示设置如下值为 1,:
 
 $$
-B[h_1(e) \% m] = B[h_2(e) \% m] = ... = B[h_{\frac{k}{2}}(e) \% m] = \\
-B[h_1(e) \% m + o(e)] = B[h_2(e) \% m + o(e)] = ... = B[h_{\frac{k}{2}}(e) \% m + o(e)] = 1
+B \left [ h_1(e) \% m \right ] = B \left [ h_2(e) \% m \right ] = ... = B \left [ h_{\frac{k}{2}}(e) \% m \right ] = \\
+B \left [ h_1(e) \% m + o(e) \right ] = B \left [ h_2(e) \% m + o(e) \right ] = ... = B \left [ h_{\frac{k}{2}}(e) \% m + o(e) \right ] = 1
 $$
 
 ![Shifting Bloom Filter](./img/ShBF.png)
@@ -71,7 +71,7 @@ $$
 
 **3.参数选择**
 
-我们选择合适的 $\bar{w}$ 参数, 使得可以在一次内存访问操作中, 同时获取 $B[h_i(e)\% m]$ 和 $B[h_i(e)\% m + o(e)]$, 因此 $\bar{w} \le w + 1 - j, 1 \le j \le 8$, 选择 $\bar{w} \le w - 7$。
+我们选择合适的 $\bar{w}$ 参数, 使得可以在一次内存访问操作中, 同时获取 $B \left [ h_i(e) \% m \right ]$ 和 $B \left [ h_i(e) \% 0m + o(e) \right ]$, 因此 $\bar{w} \le w + 1 - j, 1 \le j \le 8$, 选择 $\bar{w} \le w - 7$。
 
 **4.优势**
 
@@ -96,15 +96,15 @@ ShBF 的 FPR 与有 k 个哈希函数的 BF 十分接近, 但是其性能却是 
 对于元素 $x\in \Delta_i$,对于所有的$h \in H$, 设置
 
 $$
-\forall h \in H, B[h(x)\%m] = max(B[h(x)\%m], i), x \in \Delta_i
+\forall h \in H, B\left [ h(x) \%m \right ] = max( B \left [ h(x) \% m \right ], i), x \in \Delta_i
 $$
 
 **2.查询阶段**
 
 判断元素 x 是否属于 $\Delta_i$ 必须满足如下两个条件, 任何一个条件不符合都直接返回假: 
 
-1. $\exists h \in H, 使 B[h(x) \% m] = i;$
-2. $\forall h \in H, B[h(x) \% m] \ge i;$
+1. $\exists h \in H, 使 B \left [ h(x) \% m \right ] = i;$
+2. $\forall h \in H, B \left [ h(x) \% m \right ] \ge i;$
 
 如果存在某一个散列地址的值为 0, 则直接返回为假, 因为只有数组初始化时该位置会为 0。
 
@@ -175,7 +175,26 @@ $$
 ![K](./img/K.png)
 
 
-# 四、快速开始
+# 四、算法改进
+
+这里对 Shifting Bloom Filter 算法进行改进, 我们发现该算法虽然计算速度很快, 但是所带来的准确率并没有很大提升, 与原本的 Bloom Filter 相近。因此, 我们通过增加一个比特数组额外记录元素标志性息的方式来提高准确率, 即设置
+
+$$
+B \letf [ h_{\frac{k}{2} + 1 }(x) \% m \right ] = 1
+$$
+
+```c++
+bits_bak[Hash(key, (k_ >> 1) + 1 - 1) % FILTER_SIZE_SHBF] = 1;
+```
+
+我们进行了第三节的实验, 得出如下的实验结果: 
+
+![improve](./img/improve.png)
+
+图中所有的红色曲线代表的是我们改进的算法, 其在三种分布的数据集上均有较大的 FPR 改善, 其准确率已经近似 Spatial Bloom Filter 的效果。并且在时间上依旧比 Bloom Filter 有较大的减少, 与原来的 Shifting Bloom Filter 相比只有小幅的上升。
+
+
+# 五、快速开始
 
 1. 编译项目: 进入 build 目录使用 cmake 编译项目, 并在 bin 目录下生成应用程序
 
