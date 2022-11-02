@@ -6,8 +6,6 @@ The implement of three kinds of **Bloom Filter**
 - Shifting Bloom Filter
 - Spatial Bloom Filter
 
-[toc]
-
 # 一、算法简介
 
 ## 1.1 Bloom Filter
